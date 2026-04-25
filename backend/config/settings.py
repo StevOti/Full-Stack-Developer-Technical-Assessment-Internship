@@ -58,26 +58,26 @@ TEMPLATES = [
 WSGI_APPLICATION = 'config.wsgi.application'
 ASGI_APPLICATION = 'config.asgi.application'
 
-database_url = os.getenv('DATABASE_URL', '').strip()
 
-if database_url.startswith('postgres://'):
-    database_url = 'postgresql://' + database_url[len('postgres://'):]
+# Database configuration
+import dj_database_url
+import os
 
-if database_url:
-    parsed_url = urlparse(database_url)
-    DATABASES = {
+DATABASE_URL = os.getenv('DATABASE_URL', '').strip()
+
+# Render gives postgres:// but Django needs postgresql://
+if DATABASE_URL.startswith('postgres://'):
+    DATABASE_URL = 'postgresql://' + DATABASE_URL[len('postgres://'):]
+
+DATABASES = {
     'default': dj_database_url.config(
         default=f"sqlite:///{BASE_DIR / 'db.sqlite3'}",
+        env='DATABASE_URL',
         conn_max_age=600
     )
 }
-else:
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': BASE_DIR / 'db.sqlite3',
-        }
-    }
+
+
 
 AUTH_PASSWORD_VALIDATORS = [
     {
