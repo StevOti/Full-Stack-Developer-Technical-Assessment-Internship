@@ -65,15 +65,11 @@ if database_url.startswith('postgres://'):
 if database_url:
     parsed_url = urlparse(database_url)
     DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.postgresql',
-            'NAME': parsed_url.path.lstrip('/'),
-            'USER': parsed_url.username or '',
-            'PASSWORD': parsed_url.password or '',
-            'HOST': parsed_url.hostname or '',
-            'PORT': parsed_url.port or '',
-        }
-    }
+    'default': dj_database_url.config(
+        default=f"sqlite:///{BASE_DIR / 'db.sqlite3'}",
+        conn_max_age=600
+    )
+}
 else:
     DATABASES = {
         'default': {
