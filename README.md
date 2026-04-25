@@ -1,6 +1,6 @@
 # SmartSeason Field Monitoring System
 
-A web application for tracking crop progress across multiple fields during a growing season. Built with Django REST Framework (backend) and React (frontend), backed by PostgreSQL.
+A role-based field monitoring application for managing crop assignments, stage updates, risk detection, and seasonal progress across multiple fields. Built with Django REST Framework (backend) and React (frontend), backed by PostgreSQL.
 
 ---
 
@@ -13,7 +13,9 @@ A web application for tracking crop progress across multiple fields during a gro
 - [Field Status Logic](#field-status-logic)
 - [API Overview](#api-overview)
 - [Demo Credentials](#demo-credentials)
-- [3-Day Execution Plan](#3-day-execution-plan)
+- [Project Status](#project-status)
+- [Hosting / Deployment](#hosting--deployment)
+- [Execution Summary](#execution-summary)
 - [Assumptions Made](#assumptions-made)
 
 ---
@@ -30,9 +32,9 @@ SmartSeason allows agricultural coordinators (Admins) and field workers (Field A
 |------------|-----------------------------------|
 | Backend    | Django 5.x + Django REST Framework |
 | Auth       | JWT via `djangorestframework-simplejwt` |
-| Frontend   | React 18 + Axios + React Router v6 |
+| Frontend   | React 19 + Vite + TypeScript + React Router |
 | Database   | PostgreSQL                        |
-| Styling    | Tailwind CSS                      |
+| Styling    | Tailwind CSS v4                   |
 
 ---
 
@@ -84,13 +86,13 @@ npm install
 
 # Set up environment variables
 cp .env.example .env
-# REACT_APP_API_URL=http://localhost:8000/api
+# VITE_API_BASE_URL=http://127.0.0.1:8000
 
 # Start the development server
-npm start
+npm run dev
 ```
 
-The frontend will be running at `http://localhost:3000`
+The frontend will be running at the Vite dev server URL shown in the terminal, usually `http://localhost:5173`
 
 ---
 
@@ -102,7 +104,7 @@ Django serves a pure JSON REST API. React consumes it. This clean separation mak
 
 ### 2. JWT Authentication
 
-Used `djangorestframework-simplejwt` for stateless authentication. On login, the client receives an access token and a refresh token. The access token is stored in `localStorage` and attached to every API request via an Axios interceptor. Role-based access is enforced at the API level using custom DRF permission classes (`IsAdminUser`, `IsFieldAgent`).
+Used `djangorestframework-simplejwt` for stateless authentication. On login, the client receives an access token and a refresh token. The frontend stores the tokens in `localStorage` and attaches the access token to each API request through a shared request helper. Role-based access is enforced at the API level using custom DRF permission classes.
 
 ### 3. Role-Based Access Control
 
@@ -174,54 +176,44 @@ def get_status(self, obj):
 
 ---
 
-## 3-Day Execution Plan
+## Project Status
 
-This project was built over 3 days following a structured plan. Below is the breakdown.
+Core SmartSeason objectives are implemented:
 
-### Day 1 — Sunday 20 April: Backend Foundation
+- Admin and Field Agent roles
+- JWT authentication and refresh
+- Role-scoped field and dashboard APIs
+- Field create, update, delete, and assignment flows
+- Computed Active / At Risk / Completed status
+- Responsive React frontend with shared navigation and protected routes
 
-**Focus:** Django setup, models, auth, APIs, status logic
+The remaining step is production hosting and deployment verification.
 
-| Task | Details |
-|------|---------|
-| Project scaffold | `django-admin startproject`, create `users` and `fields` apps, set up virtual environment, install DRF, SimpleJWT, CORS, psycopg2 |
-| Database & models | PostgreSQL setup. `User` model with role field. `Field` model with name, crop type, planting date, stage, assigned agent FK. Run migrations. |
-| JWT auth endpoints | `POST /api/auth/login/` returns access + refresh tokens. Demo users seeded. |
-| Field CRUD API | List (role-scoped), create (admin), update stage/notes (agent). Custom permission classes. |
-| Field status logic | Computed `status` property in serializer: Active / At Risk / Completed. |
-| Dashboard endpoint | `GET /api/dashboard/` returns total fields, status breakdown, stage breakdown — scoped by role. |
+## Hosting / Deployment
 
----
+Deployment is configured through `render.yaml` at the project root.
 
-### Day 2 — Monday 21 April: Frontend Core
+- Backend: Django API running on Gunicorn
+- Frontend: Vite static site
+- Database: managed PostgreSQL
 
-**Focus:** React app, auth flow, dashboards, field management UI
+For local frontend development, copy `frontend/.env.example` to `frontend/.env` and set:
 
-| Task | Details |
-|------|---------|
-| React app setup | `create-react-app`, install Axios + React Router. Folder structure: `/pages`, `/components`, `/services`, `/context`. |
-| Auth context + login page | `AuthContext` with JWT in localStorage. Login form → redirect by role. `PrivateRoute` HOC for protected pages. |
-| Admin dashboard | Summary cards (total, active, at-risk, completed). Table of all fields with status badges. |
-| Agent dashboard | Same layout, scoped to assigned fields. Empty state for no assignments. |
-| Field detail + update form | Stage dropdown + notes textarea for agents. PATCH to `/api/fields/:id/`. |
-| Admin field management | Create field form. Assign agent dropdown from `/api/users/?role=agent`. |
+```bash
+VITE_API_BASE_URL=http://127.0.0.1:8000
+```
 
----
+For production, update `VITE_API_BASE_URL` to the deployed backend URL and ensure the backend CORS allowlist includes the deployed frontend origin.
 
-### Day 3 — Tuesday 22 April: Polish + Submission
+## Execution Summary
 
-**Focus:** QA, deployment config, documentation, submission
+This project was built in phases:
 
-| Task | Details |
-|------|---------|
-| End-to-end test run | Admin creates fields, assigns agents. Agent updates stages. Verify dashboard updates and At Risk logic. |
-| CORS + deployment config | `ALLOWED_HOSTS`, `CORS_ALLOWED_ORIGINS` in Django settings. React build. Optional: Railway/Render + Vercel. |
-| README | Setup instructions, design decisions, status logic explanation, demo credentials. |
-| Code cleanup | Remove logs, check `.gitignore`, add `.env.example`, verify API error handling. |
-| GitHub repo | Push, confirm README renders, test clone → setup flow. |
-| Email submission | Deadline: 25 April. Repo link + access details. |
-
----
+- Backend foundation and auth
+- Field model, dashboard, permissions, and tests
+- Frontend rebuild with responsive shell and route-based auth flow
+- Field CRUD dashboard integration
+- Permission hardening and end-to-end verification
 
 ## Assumptions Made
 
