@@ -143,6 +143,13 @@ class PublicEndpointTests(TestCase):
     def setUp(self):
         self.client = APIClient()
 
+    def test_root_returns_service_payload(self):
+        response = self.client.get('/')
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.json()['service'], 'SmartSeason API')
+        self.assertEqual(response.json()['status'], 'ok')
+
     def test_health_check_returns_ok(self):
         response = self.client.get('/health/')
 
