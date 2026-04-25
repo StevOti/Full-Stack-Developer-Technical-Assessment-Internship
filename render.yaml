@@ -30,7 +30,7 @@ services:
         destination: /index.html
     envVars:
       - key: VITE_API_BASE_URL
-        value: https://smartseason-api.onrender.com
+        value: https://smartseason-field-monitoring-system-1-ddcj.onrender.com
 
 databases:
   - name: smartseason-db
