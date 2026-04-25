@@ -32,6 +32,36 @@ class UserAuthTests(TestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertIn('access', response.data)
         self.assertIn('refresh', response.data)
+        self.assertEqual(response.data['user']['role'], User.Role.ADMIN)
+        self.assertEqual(response.data['user']['email'], self.admin.email)
+
+    def test_register_endpoint_creates_user_and_returns_tokens(self):
+        payload = {
+            'email': 'newagent@smartseason.com',
+            'password': 'Welcome123!',
+            'first_name': 'New',
+            'last_name': 'Agent',
+            'role': User.Role.AGENT,
+        }
+
+        response = self.client.post('/api/auth/register/', payload, format='json')
+
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertIn('access', response.data)
+        self.assertIn('refresh', response.data)
+        self.assertEqual(response.data['user']['email'], payload['email'])
+        self.assertTrue(User.objects.filter(email=payload['email'], role=User.Role.AGENT).exists())
+
+    def test_register_preflight_allows_localhost_dev_origin(self):
+        response = self.client.options(
+            '/api/auth/register/',
+            HTTP_ORIGIN='http://localhost:5174',
+            HTTP_ACCESS_CONTROL_REQUEST_METHOD='POST',
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response['access-control-allow-origin'], 'http://localhost:5174')
+        self.assertIn('POST', response['access-control-allow-methods'])
 
     def test_seed_users_command_creates_demo_accounts(self):
         call_command('seed_users')

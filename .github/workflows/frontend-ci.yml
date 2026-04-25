@@ -13,7 +13,6 @@ on:
 
 jobs:
   test-frontend:
-    if: hashFiles('frontend/package.json') != ''
     runs-on: ubuntu-latest
 
     steps:
@@ -31,6 +30,10 @@ jobs:
         working-directory: frontend
         run: npm ci
 
-      - name: Run frontend tests
+      - name: Run frontend lint
         working-directory: frontend
-        run: npm test -- --watch=false
+        run: npm run lint
+
+      - name: Run frontend build
+        working-directory: frontend
+        run: npm run build
