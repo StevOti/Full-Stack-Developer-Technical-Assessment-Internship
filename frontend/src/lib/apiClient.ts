@@ -1,6 +1,20 @@
 import { clearAuthSession, getAuthSession, getRefreshToken, updateAccessToken } from './authStorage'
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? 'http://127.0.0.1:8000'
+function resolveApiBaseUrl() {
+  const configuredUrl = (import.meta.env.VITE_API_BASE_URL ?? '').trim()
+  if (configuredUrl) {
+    return configuredUrl
+  }
+
+  if (import.meta.env.DEV) {
+    return 'http://127.0.0.1:8000'
+  }
+
+  // Safe production fallback to avoid localhost calls from deployed clients.
+  return 'https://smartseason-field-monitoring-system-1-ddcj.onrender.com'
+}
+
+const API_BASE_URL = resolveApiBaseUrl()
 
 class ApiError extends Error {
   status: number
