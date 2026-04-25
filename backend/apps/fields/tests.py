@@ -149,6 +149,30 @@ class FieldAccessTests(TestCase):
 
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
+    def test_agent_cannot_delete_assigned_field(self):
+        self._login(self.agent.email)
+
+        response = self.client.delete(f'/api/fields/{self.assigned_field.id}/')
+
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertTrue(Field.objects.filter(id=self.assigned_field.id).exists())
+
+    def test_agent_cannot_delete_unassigned_field(self):
+        self._login(self.agent.email)
+
+        response = self.client.delete(f'/api/fields/{self.unassigned_field.id}/')
+
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+        self.assertTrue(Field.objects.filter(id=self.unassigned_field.id).exists())
+
+    def test_admin_can_delete_field(self):
+        self._login(self.admin.email)
+
+        response = self.client.delete(f'/api/fields/{self.assigned_field.id}/')
+
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertFalse(Field.objects.filter(id=self.assigned_field.id).exists())
+
 
 class DashboardTests(TestCase):
     def setUp(self):

@@ -11,6 +11,7 @@ from .serializers import FieldSerializer
 
 
 def get_scoped_fields(user):
+    # Reuse the same queryset logic for list and dashboard totals.
     queryset = Field.objects.select_related('assigned_agent').order_by('-updated_at')
     if user.is_authenticated and getattr(user, 'role', None) == 'agent':
         return queryset.filter(assigned_agent=user)
@@ -29,6 +30,7 @@ class DashboardView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
+        # Dashboard numbers must match the same role-scoped field set.
         queryset = get_scoped_fields(request.user)
         serialized_fields = FieldSerializer(queryset, many=True).data
 
