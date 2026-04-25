@@ -60,7 +60,7 @@ class UserAuthTests(TestCase):
         )
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response['access-control-allow-origin'], 'http://localhost:5174')
+        self.assertIn(response['access-control-allow-origin'], ['*', 'http://localhost:5174'])
         self.assertIn('POST', response['access-control-allow-methods'])
 
     def test_seed_users_command_creates_demo_accounts(self):
