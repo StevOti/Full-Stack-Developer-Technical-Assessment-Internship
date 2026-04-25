@@ -1,5 +1,4 @@
 import os
-from urllib.parse import urlparse
 from pathlib import Path
 
 import dj_database_url
@@ -60,9 +59,6 @@ ASGI_APPLICATION = 'config.asgi.application'
 
 
 # Database configuration
-import dj_database_url
-import os
-
 DATABASE_URL = os.getenv('DATABASE_URL', '').strip()
 
 # Render gives postgres:// but Django needs postgresql://

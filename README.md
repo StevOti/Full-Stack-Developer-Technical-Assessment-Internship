@@ -187,11 +187,11 @@ Core SmartSeason objectives are implemented:
 - Computed Active / At Risk / Completed status
 - Responsive React frontend with shared navigation and protected routes
 
-The remaining step is production hosting and deployment verification.
+Production hosting and deployment verification are complete.
 
 ## Hosting / Deployment
 
-Deployment is configured through `render.yaml` at the project root.
+Deployment is configured on Render for both backend and frontend services.
 
 - Backend: Django API running on Gunicorn
 - Frontend: Vite static site
@@ -203,7 +203,15 @@ For local frontend development, copy `frontend/.env.example` to `frontend/.env` 
 VITE_API_BASE_URL=http://127.0.0.1:8000
 ```
 
-For production, update `VITE_API_BASE_URL` to the deployed backend URL and ensure the backend CORS allowlist includes the deployed frontend origin.
+For production, set `VITE_API_BASE_URL` to the deployed backend URL.
+
+Current production value:
+
+```bash
+VITE_API_BASE_URL=https://smartseason-field-monitoring-system-1-ddcj.onrender.com
+```
+
+Note: the frontend uses `VITE_API_BASE_URL` (not `VITE_BASE_URL`).
 
 ## Execution Summary
 
