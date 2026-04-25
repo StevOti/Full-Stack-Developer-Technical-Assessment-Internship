@@ -58,6 +58,8 @@ TEMPLATES = [
 WSGI_APPLICATION = 'config.wsgi.application'
 ASGI_APPLICATION = 'config.asgi.application'
 
+
+# Database configuration
 import dj_database_url
 import os
 
@@ -74,6 +76,8 @@ DATABASES = {
         conn_max_age=600
     )
 }
+
+
 
 AUTH_PASSWORD_VALIDATORS = [
     {
